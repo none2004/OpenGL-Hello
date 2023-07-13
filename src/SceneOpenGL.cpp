@@ -1,13 +1,27 @@
-#include "SceneOpenGL.hpp"
-#include <iostream>
-#include "Shader.hpp"
+#include "SceneOpenGL.h"
 
-SceneOpenGL::SceneOpenGL(std::string titreFenetre, int largeurFenetre, int hauteurFenetre):
-    m_titreFenetre(titreFenetre), m_largeurFenetre(largeurFenetre), m_hauteurFenetre(hauteurFenetre),
-    m_fenetre(0), m_contexteOpenGL(0)
+// Includes GLM
+
+#include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+
+// Autres includes
+
+#include <SDL.h>
+#include <iostream>
+#include <string>
+#include "Shader.h"
+
+using namespace glm;
+
+SceneOpenGL::SceneOpenGL(std::string titreFenetre, int largeurFenetre, int hauteurFenetre) : m_titreFenetre(titreFenetre), m_largeurFenetre(largeurFenetre),
+                                                                                             m_hauteurFenetre(hauteurFenetre), m_fenetre(0), m_contexteOpenGL(0)
 {
-    //ctor
+
 }
+
 
 SceneOpenGL::~SceneOpenGL()
 {
@@ -15,6 +29,9 @@ SceneOpenGL::~SceneOpenGL()
     SDL_DestroyWindow(m_fenetre);
     SDL_Quit();
 }
+
+
+// Méthodes
 
 bool SceneOpenGL::initialiserFenetre()
 {
@@ -70,6 +87,7 @@ bool SceneOpenGL::initialiserFenetre()
     return true;
 }
 
+
 bool SceneOpenGL::initGL()
 {
     #ifdef WIN32
@@ -105,29 +123,29 @@ bool SceneOpenGL::initGL()
     return true;
 }
 
+
 void SceneOpenGL::bouclePrincipale()
 {
     // Variables
 
     bool terminer(false);
-    float vertices[] = {-0.5, 0.0,   0.0, 1.0,   0.5, 0.0,
-                        -0.5, 0.0,   0.0, -1.0,   0.5, 0.0};
-
-    // On définie les couleurs
-
-    float couleurs[] = {240.0 / 255.0, 210.0 / 255.0, 23.0 / 255.0,     // Vertex 1
-                        230.0 / 255.0, 0.0, 230.0 / 255.0,              // Vertex 2
-                        0.0, 1.0, 0.0,                                  // Vertex 3
-
-                        240.0 / 255.0, 210.0 / 255.0, 23.0 / 255.0,     // Vertex 4 (Copie du 1)
-                        0.0, 0.0, 1.0,                                  // Vertex 5
-                        0.0, 1.0, 0.0};
+    float vertices[] = {-0.5, -0.5, -1.0,   0.0, 0.5, -1.0,   0.5, -0.5, -1.0};
+    float couleurs[] = {1.0, 0.0, 0.0,  0.0, 1.0, 0.0,  0.0, 0.0, 1.0};
 
 
     // Shader
 
-    Shader shaderCouleur("Shaders/couleur2D.vert", "Shaders/couleur2D.frag");
-    shaderCouleur.initialiser();
+    Shader shaderCouleur("Shaders/couleur3D.vert", "Shaders/couleur3D.frag");
+    shaderCouleur.charger();
+
+
+    // Matrices
+
+    mat4 projection;
+    mat4 modelview;
+
+    projection = perspective(71.0, (double) m_largeurFenetre / m_hauteurFenetre, 1.0, 100.0);
+    modelview = mat4(1.0);
 
 
     // Boucle principale
@@ -139,7 +157,7 @@ void SceneOpenGL::bouclePrincipale()
         SDL_WaitEvent(&m_evenements);
 
         if(m_evenements.window.event == SDL_WINDOWEVENT_CLOSE)
-            terminer = 1;
+            terminer = true;
 
 
         // Nettoyage de l'écran
@@ -147,34 +165,46 @@ void SceneOpenGL::bouclePrincipale()
         glClear(GL_COLOR_BUFFER_BIT);
 
 
-        // Activation du shader
+        // Réinitialisation de la matrice modelview
+
+        modelview = mat4(1.0);
+
+
+        // On spécifie quel shader utiliser
 
         glUseProgram(shaderCouleur.getProgramID());
 
 
-        // On remplie puis on active le tableau Vertex Attrib 0
+            // On remplie puis on active le tableau Vertex Attrib 0
 
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, vertices);
-        glEnableVertexAttribArray(0);
-
-
-        // On rentre les couleurs dans le tableau Vertex Attrib 1
-
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, couleurs);
-        glEnableVertexAttribArray(1);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, vertices);
+            glEnableVertexAttribArray(0);
 
 
-        // On affiche le triangle
+            // Même chose avec le tableau Vertex Attrib 1
 
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, couleurs);
+            glEnableVertexAttribArray(1);
 
 
-        // Désactivation des tableaux Vertex Attrib
+            // On envoie les matrices au shader
 
-        glDisableVertexAttribArray(1);
-        glDisableVertexAttribArray(0);
+            glUniformMatrix4fv(glGetUniformLocation(shaderCouleur.getProgramID(), "modelview"), 1, GL_FALSE, value_ptr(modelview));
+            glUniformMatrix4fv(glGetUniformLocation(shaderCouleur.getProgramID(), "projection"), 1, GL_FALSE, value_ptr(projection));
 
-        // Désactivation du shader
+
+            // On affiche le polygone
+
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+
+
+            // On désactive les tableaux Vertex Attrib puisque l'on n'en a plus besoin
+
+            glDisableVertexAttribArray(1);
+            glDisableVertexAttribArray(0);
+
+
+        // On n'utilise plus le shader
 
         glUseProgram(0);
 
@@ -184,4 +214,3 @@ void SceneOpenGL::bouclePrincipale()
         SDL_GL_SwapWindow(m_fenetre);
     }
 }
-

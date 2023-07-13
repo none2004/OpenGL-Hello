@@ -13,9 +13,10 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
-					<Add directory="../../../../../../Program Files/CodeBlocks/MinGW/SDL2-2.28.1/x86_64-w64-mingw32/include/SDL2" />
 					<Add directory="../../../../../../Program Files/CodeBlocks/MinGW/glew-2.1.0/include/GL" />
+					<Add directory="../../../../../../Program Files/CodeBlocks/MinGW/SDL2-2.28.1/x86_64-w64-mingw32/include/SDL2" />
 					<Add directory="include" />
+					<Add directory="C:/Program Files/CodeBlocks/MinGW/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-lmingw32 -lSDL2main -lSDL2" />
@@ -43,7 +44,9 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="include/SceneOpenGL.h" />
 		<Unit filename="include/SceneOpenGL.hpp" />
+		<Unit filename="include/Shader.h" />
 		<Unit filename="include/Shader.hpp" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/SceneOpenGL.cpp" />

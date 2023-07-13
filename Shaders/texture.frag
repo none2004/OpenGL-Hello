@@ -1,13 +1,28 @@
-#version 140
+// Version du GLSL
 
-in vec3 color;
-in vec2 texCoord0;
+#version 150 core
 
-out vec4 out_Color;
+
+// Entrée
+
+in vec2 coordTexture;
+
+
+// Uniform
 
 uniform sampler2D texture;
 
+
+// Sortie 
+
+out vec4 out_Color;
+
+
+// Fonction main
+
 void main()
 {
-    out_Color = texture2D(texture, texCoord0);
+    // Couleur du pixel
+
+    out_Color = texture(texture, coordTexture);
 }

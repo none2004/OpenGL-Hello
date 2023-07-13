@@ -2,7 +2,7 @@
 #include <glew.h>
 
 #endif
-#include "SceneOpenGL.hpp"
+#include "SceneOpenGL.h"
 #include <SDL.h>
 #include <iostream>
 
@@ -10,7 +10,7 @@ int main(int argc, char **argv)
 {
     // Création de la sène
 
-    SceneOpenGL scene("Chapitre 3", 800, 600);
+    SceneOpenGL scene("OpenGl Matrice", 800, 600);
 
     // Initialisation de la scène
 

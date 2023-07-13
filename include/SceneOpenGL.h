@@ -1,13 +1,27 @@
-#ifndef SCENEOPENGL_HPP
-#define SCENEOPENGL_HPP
+#ifndef DEF_SCENEOPENGL
+#define DEF_SCENEOPENGL
+
+
+// Includes
 
 #ifdef WIN32
 #include <glew.h>
 #endif
 
+
+// Includes GLM
+
+#include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+
+// Autres includes
+
 #include <SDL.h>
 #include <iostream>
 #include <string>
+#include "Shader.h"
 
 // Classe
 
@@ -34,4 +48,5 @@ class SceneOpenGL
     SDL_Event m_evenements;
 };
 
-#endif // SCENEOPENGL_HPP
+#endif
+
